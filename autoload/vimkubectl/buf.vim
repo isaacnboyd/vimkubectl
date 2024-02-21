@@ -73,7 +73,7 @@ fun! s:refresh(data, ctx) abort
   "  return
   "endif
 
-  const header = s:headerText(a:ctx.resourceType, len(a:data), a:ctx.ns)
+  const header = s:headerText(a:ctx.resourceSpec, len(a:data), a:ctx.ns)
 
   " Clear the "loading" message
   "echo ''
@@ -134,6 +134,45 @@ fun! vimkubectl#buf#view_prepare() abort
         \ l:ctx
         \ )
 endfun
+
+fun! vimkubectl#buf#doc_prepare() abort
+  if exists('b:vimkubectl_prepared')
+    return
+  endif
+  call vimkubectl#util#showMessage('Loading...')
+
+  setlocal buftype=nowrite
+  setlocal bufhidden=delete
+  setlocal filetype=kubernetes
+  setlocal noswapfile
+
+  nnoremap <silent><buffer> g? :help vimkubectl-mapping<CR>
+
+  " TODO: remove buffer if initial population fails
+  const ns = vimkubectl#kube#fetchActiveNamespace()
+  if v:shell_error !=# 0
+    call vimkubectl#util#printError('Unable to fetch active namespace.')
+    return
+  endif
+
+  const resourceSpec = substitute(expand('%'), '^kubeDoc://', '', '')
+  const ctx = {
+        \ 'bufnr': bufnr(),
+        \ 'resourceSpec': l:resourceSpec,
+        \ 'ns': l:ns,
+        \ }
+
+  let b:vimkubectl_prepared = 1
+  let b:vimkubectl_jobid = vimkubectl#kube#fetchDoc(
+        \ l:resourceSpec, 
+        \ l:ns, 
+        \ function('s:refresh'), 
+        \ l:ctx
+        \ )
+endfun
+
+
+
 
 fun! s:fillBuffer(bufnr, data) abort
   if len(a:data) <=# 1
@@ -243,6 +282,17 @@ fun! vimkubectl#buf#edit_load(openMethod, resourceType, resourceName) abort
     " refresh needs to be done explicitly because buffer override will not
     " happen to exising buffers (due to BufReadCmd)
     call s:refreshEditBuffer()
+  endif
+endfun
+
+" Create or switch to edit buffer(kube://{resourceSpec})
+fun! vimkubectl#buf#doc_load(openMethod, resourceSpec) abort
+  " TODO verify if openMethod is valid
+  const existing = bufwinnr('^kubeDoc://' . a:resourceSpec . '$')
+  if l:existing ==# -1
+    execute a:openMethod . ' kubeDoc://' . a:resourceSpec 
+  else
+    execute l:existing . 'wincmd w'
   endif
 endfun
 

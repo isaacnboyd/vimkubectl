@@ -82,20 +82,26 @@ fun! vimkubectl#viewResourceDoc(args) abort
   call vimkubectl#buf#doc_load('split', l:resourceSpec)
 endfun
 
-" This one is determining if we are doing a Kedit or a Kget, both open
-" buffers. I'll need another for Kdoc
+" This one is determining if user is doing a Kedit, Kget, or Kdoc
 " If there are / then edit_prepare
 " If there are no / then view_prepare
-" If there are kubeDoc then doc_prepare!
+" If there are no / on a kubeDoc buffer then
+" open doc
+" This function could be improved to be more explicit
 fun! vimkubectl#hijackBuffer() abort
-  "const resource = substitute(expand('%'), '^kube://', '', '')
-  "const parsedResource = split(l:resource, '/')
-  "if len(parsedResource) ==# 1
-  "  call vimkubectl#buf#view_prepare()
-  "else
-  "  call vimkubectl#buf#edit_prepare()
-  "endif
-  call vimkubectl#buf#doc_prepare() 
+  const resource = substitute(expand('%'), '^kube://', '', '')
+  const parsedResource = split(l:resource, '/')
+  if len(parsedResource) ==# 1
+    call vimkubectl#buf#view_prepare()
+  else
+    call vimkubectl#buf#edit_prepare()
+  endif
+
+  const docResource = substitute(expand('%'), '^kubeDoc://', '', '')
+  const parsedDocResource = split(l:docResource, '/')
+  if len(parsedDocResource) ==# 1
+    call vimkubectl#buf#doc_prepare()
+  endif
 endfun
 
 fun! vimkubectl#cleanupBuffer(buf) abort

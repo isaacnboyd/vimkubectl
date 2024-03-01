@@ -73,7 +73,7 @@ fun! s:refresh(data, ctx) abort
   "  return
   "endif
 
-  const header = s:headerText(a:ctx.resourceSpec, len(a:data), a:ctx.ns)
+  const header = s:headerText(a:ctx.resourceType, len(a:data), a:ctx.ns)
 
   " Clear the "loading" message
   "echo ''
@@ -158,7 +158,7 @@ fun! vimkubectl#buf#doc_prepare() abort
   const resourceSpec = substitute(expand('%'), '^kubeDoc://', '', '')
   const ctx = {
         \ 'bufnr': bufnr(),
-        \ 'resourceSpec': l:resourceSpec,
+        \ 'resourceType': l:resourceSpec,
         \ 'ns': l:ns,
         \ }
 
@@ -166,7 +166,7 @@ fun! vimkubectl#buf#doc_prepare() abort
   let b:vimkubectl_jobid = vimkubectl#kube#fetchDoc(
         \ l:resourceSpec, 
         \ l:ns, 
-        \ function('s:refresh'), 
+        \ function('s:refresh'),
         \ l:ctx
         \ )
 endfun
@@ -285,7 +285,7 @@ fun! vimkubectl#buf#edit_load(openMethod, resourceType, resourceName) abort
   endif
 endfun
 
-" Create or switch to edit buffer(kube://{resourceSpec})
+" Create or switch to doc buffer(kube://{resourceSpec})
 fun! vimkubectl#buf#doc_load(openMethod, resourceSpec) abort
   " TODO verify if openMethod is valid
   const existing = bufwinnr('^kubeDoc://' . a:resourceSpec . '$')

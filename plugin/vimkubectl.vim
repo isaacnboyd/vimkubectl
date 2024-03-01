@@ -13,6 +13,8 @@ command -bar -nargs=+ K call vimkubectl#runCmd(<q-args>)
 
 augroup vimkubectl_internal
   autocmd! *
+  autocmd BufReadCmd kube://* nested call vimkubectl#hijackBuffer()
+  autocmd BufDelete kube://* nested call vimkubectl#cleanupBuffer(expand('<abuf>'))
   autocmd BufReadCmd kubeDoc://* nested call vimkubectl#hijackBuffer()
   autocmd BufDelete kubeDoc://* nested call vimkubectl#cleanupBuffer(expand('<abuf>'))
 augroup END

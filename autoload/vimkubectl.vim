@@ -89,19 +89,7 @@ endfun
 " open doc
 " This function could be improved to be more explicit
 fun! vimkubectl#hijackBuffer() abort
-  const resource = substitute(expand('%'), '^kube://', '', '')
-  const parsedResource = split(l:resource, '/')
-  if len(parsedResource) ==# 1
-    call vimkubectl#buf#view_prepare()
-  else
-    call vimkubectl#buf#edit_prepare()
-  endif
-
-  const docResource = substitute(expand('%'), '^kubeDoc://', '', '')
-  const parsedDocResource = split(l:docResource, '/')
-  if len(parsedDocResource) ==# 1
-    call vimkubectl#buf#doc_prepare()
-  endif
+  call vimkubectl#buf#doc_prepare()
 endfun
 
 fun! vimkubectl#cleanupBuffer(buf) abort

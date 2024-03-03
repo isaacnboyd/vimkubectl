@@ -165,7 +165,7 @@ fun! vimkubectl#kube#fetchDoc(
       \ ) abort
   const cmd = s:craftCmd(join(['explain', a:resourceSpec ]), a:namespace)
   return vimkubectl#util#asyncRun(
-        \ s:asyncCmd(l:cmd),
+        \ s:asyncLoopCmd(l:cmd),
         \ a:callback,
         \ 'array',
         \ a:ctx

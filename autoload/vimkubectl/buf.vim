@@ -143,7 +143,7 @@ fun! vimkubectl#buf#doc_prepare() abort
 
   setlocal buftype=nowrite
   setlocal bufhidden=delete
-  setlocal filetype=kubernetes
+  setlocal filetype=text
   setlocal noswapfile
 
   nnoremap <silent><buffer> g? :help vimkubectl-mapping<CR>
@@ -290,7 +290,7 @@ fun! vimkubectl#buf#doc_load(openMethod, resourceSpec) abort
   " TODO verify if openMethod is valid
   const existing = bufwinnr('^kubeDoc://' . a:resourceSpec . '$')
   if l:existing ==# -1
-    execute a:openMethod . ' kubeDoc://' . a:resourceSpec 
+    execute a:openMethod . ' kubeDoc://' . a:resourceSpec
   else
     execute l:existing . 'wincmd w'
   endif
